@@ -76,6 +76,12 @@ class TestGetModelClass:
 
         assert get_model_class("any-model", "litellm_response") == LitellmResponseModel
 
+    def test_vllm_model_selection(self):
+        """Test that vllm model class can be selected."""
+        from minisweagent.models.vllm_model import VllmModel
+
+        assert get_model_class("any-model", "vllm") == VllmModel
+
 
 class TestGetModel:
     def test_config_deep_copy(self):
@@ -137,6 +143,14 @@ class TestGetModel:
         assert model.config.outputs == outputs
         assert model.config.cost_per_call == 2.0
         assert model.config.model_name == "test-model"
+
+    def test_get_vllm_model_defaults(self):
+        """Test that vllm model class injects local defaults."""
+        with patch.dict(os.environ, {}, clear=True):
+            model = get_model("hosted_vllm/foo", {"model_class": "vllm"})
+            assert model.config.model_kwargs["api_base"] == "http://localhost:8000/v1"
+            assert model.config.model_kwargs["api_key"] == "EMPTY"
+            assert model.config.cost_tracking == "ignore_errors"
 
 
 class TestGlobalModelStats:

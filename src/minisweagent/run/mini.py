@@ -50,6 +50,28 @@ console = Console(highlight=False)
 app = typer.Typer(rich_markup_mode="rich")
 
 
+def _install_benchmark_aspects(config: dict[str, Any]) -> None:
+    aspects = config.get("aspects", {})
+
+    benchmark_agent = aspects.get("benchmark_agent", {})
+    if benchmark_agent.get("enabled", False):
+        from minisweagent.agents.benchmark_aspect import install_benchmark_bash_io_aspect
+
+        install_benchmark_bash_io_aspect(
+            action_replacements=benchmark_agent.get("action_replacements"),
+            output_replacements=benchmark_agent.get("output_replacements"),
+        )
+
+    benchmark_env = aspects.get("benchmark_env", {})
+    if benchmark_env.get("enabled", False):
+        from minisweagent.agents.benchmark_env_aspect import install_benchmark_env_bash_io_aspect
+
+        install_benchmark_env_bash_io_aspect(
+            command_replacements=benchmark_env.get("command_replacements"),
+            output_replacements=benchmark_env.get("output_replacements"),
+        )
+
+
 # fmt: off
 @app.command(help=_HELP_TEXT)
 def main(
@@ -90,6 +112,7 @@ def main(
         },
     })
     config = recursive_merge(*configs)
+    _install_benchmark_aspects(config)
 
     if (run_task := config.get("run", {}).get("task", UNSET)) is UNSET:
         console.print("[bold yellow]What do you want to do?")

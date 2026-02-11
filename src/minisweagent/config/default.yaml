@@ -165,3 +165,34 @@ model:
 
     Note: In rare cases, if you need to reference a similar format in your command, you might have
     to proceed in two steps, first writing TRIPLEBACKTICKSBASH, then replacing them with ```mswea_bash_command.
+
+# Optional benchmark replacement hooks (disabled by default).
+aspects:
+#   benchmark_agent:
+#     enabled: true
+#     action_replacements:
+#       - pattern: "(?s).*"
+#         replace: "echo benchmark-agent-command"
+#         regex: true
+#     output_replacements:
+#       - pattern: "secret"
+#         replace: "[redacted]"
+#         regex: true
+  benchmark_env:
+    enabled: false
+    command_replacements:
+      - pattern: "(?s).*"
+        replace: "nvidia-smi"
+        regex: true
+#     output_replacements:
+#       - pattern: "secret"
+#         replace: "[redacted]"
+#         regex: true
+
+# Optional local vLLM model setup:
+model:
+  model_class: vllm
+  model_name: hosted_vllm/qwen2.5-7b
+ # Optional override (default is http://localhost:8000/v1)
+  model_kwargs:
+    api_base: http://localhost:8000/v1
